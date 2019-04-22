@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang=zh-CN>
+
+	<head>
+		<meta charset=UTF-8>
+		<meta name=viewport content="width=device-width,initial-scale=1" />
+		<title> MM应用分发实时数据 </title>
+		<link href="index.css?v=1.5" rel="stylesheet">
+		<!--<link href="css/odometer-theme-car.css" rel="stylesheet">-->
+		<script src = "js/polyfill.min.js"></script> 
+		<script type="text/javascript" src="js/vue.js"></script>
+	</head>
+
+	<body style="overflow-y: hidden">
+		<div id="app">
+			<div class=daping-wrap>
+				<div class=content>
+					<div class="flex-box flex-box-bet">
+						<div class="flex-item fl">
+							<div class=sub-box>
+								<div class="header flex-box flex-box-s "> 
+									<span class="text text-gradient"> 分省下载量TOP </span> 
+									<span class="sub-title">次</span>
+								</div>
+								<div class="pannel-body flex-box-bet">
+									<div class="chart-flex-item">
+										<div ref="fenshengDown" v-show="leftChartFlag" class=fensheng-down id=fensheng-down></div>
+										<div ref="fenshengDown2" v-show="!leftChartFlag" class=fensheng-down id=fensheng-down></div>
+									</div>
+									<div class="num-flex-item">
+										<div class="chart-data-num" v-show="leftChartFlag"	v-for= "(item,index) in downloadProvinceTop.slice(0,6)" :key=index>{{item.value}}</div>
+										<div class="chart-data-num" v-show="!leftChartFlag"	v-for= "(item,index) in downloadProvinceTop.slice(6,12)" :key=index>{{item.value}}</div>
+				                     </div>
+									</div>
+								<div class=bottom></div>
+							</div>
+							<div class=sub-box>
+								<div class="header flex-box flex-box-s "> 
+									<span class="text text-gradient"> 下载用户量TOP </span>
+									<span class="sub-title">户</span>
+								</div>
+								<div class="pannel-body  flex-box-bet">
+									<div class="chart-flex-item">
+									    <div ref="downUser" v-show="leftChartFlag" class="fensheng-down down-user"></div>
+									    <div ref="downUser2" v-show="!leftChartFlag" class="fensheng-down down-user"></div>
+									</div>
+									<div class="num-flex-item light-orange">
+										<div class="chart-data-num" v-show="leftChartFlag"	v-for= "(item,index) in downloadUserTop.slice(0,6)" :key=index>{{item.value}}</div>
+										<div class="chart-data-num" v-show="!leftChartFlag"	v-for= "(item,index) in downloadUserTop.slice(6,12)" :key=index>{{item.value}}</div>
+									</div>
+								
+								</div>
+								<div class=bottom></div>
+							</div>
+							<div class=sub-box>
+								<div class="header flex-box flex-box-s ">
+									<span class="text text-gradient"> 下载流量TOP</span> 
+									<span class="sub-title">GB</span>
+								</div>
+								<div class="pannel-body flex-box-bet">
+									<div class="chart-flex-item">
+										<div ref="downLiuliang" v-show="leftChartFlag" class="fensheng-down down-liuliang"></div>
+										<div ref="downLiuliang2" v-show="!leftChartFlag" class="fensheng-down down-liuliang"></div>
+									</div>
+									<div class="num-flex-item light-yan">
+										<div class="chart-data-num" v-show="leftChartFlag"	v-for= "(item,index) in downloadTrafficTop.slice(0,6)" :key=index>{{item.value}}</div>
+										<div class="chart-data-num" v-show="!leftChartFlag"	v-for= "(item,index) in downloadTrafficTop.slice(6,12)" :key=index>{{item.value}}</div>
+									</div>
+								</div>
+								<div class=bottom></div>
+							</div>
+						</div>
+						<div class="flex-item-2 flex-main">
+							<div class=middle-box>
+								<div class=header>
+									<div class="h4 title text-gradient"> MM应用分发实时数据 </div>
+									<div class="header-info flex-box-bet">
+										<div class="item flex-item text-gradient">{{nowDate}}</div>
+										<div class="item flex-item dangyi">当日总下载量</div>
+										<div class="item flex-item text-gradient">{{nowTime}}</div>
+									</div>
+								</div>
+								<div  class="total down-app-total totalOne "></div>
+<!--								<div v-if="!totalFlag" ref="totalTwo" class="total down-app-total totalTwo"></div>-->
+								<div class=map>
+									<div ref="chinaMap" class=china-map></div>
+									<div ref="xintiaoMap" class="xintiao-map">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="flex-item fr">
+							<div class=sub-box>
+								<div class="header flex-box flex-box-s "> 
+									<span class="text text-gradient"> 应用下载量TOP排行榜</span>
+									<span class="sub-title">次</span>
+								</div>
+								<div class="pannel-body r1" v-show="showR1" ref="r1">
+									<div class="top-2 flex-box-bet">
+										<div v-for="(item, key) in appTop18.slice(0,2)" :key="key">
+											<div class="item">
+												<span class="rand">
+													{{key +1}}
+												</span>
+												<div class="icon">
+													<img :src="item.icon" >
+												</div>
+												<div class="info">
+													<span class="app-name">{{item.name}}</span>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class=other-rand>
+										<div class=flex-box>
+											<div class="item" v-for="(item,index) in appTop18.slice(2,6) ">
+												<div class="icon">
+													<img :src="item.icon" />
+												</div>
+												<div class="info">
+													<span class="rand">{{index+3}}</span>
+													<div class="app-name">{{item.name}}</div>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+										<div class=flex-box>
+											<div class="item" v-for="(item,index) in appTop18.slice(6,10) ">
+												<div class="icon">
+													<img :src="item.icon" />
+												</div>
+												<div class="info">
+													<span class="rand">{{index+7}}</span>
+													<div class="app-name">{{item.name}}</div>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<div class="pannel-body r1" v-show="!showR1" ref="r1">
+									<div class="top-2 flex-box-bet">
+										<div v-for="(item, key) in appTop18.slice(0,2)" :key="key">
+											<div class="item">
+												<span class="rand">
+													{{key +1}}
+												</span>
+												<div class="icon">
+													<img :src="item.icon" >
+												</div>
+												<div class="info">
+													<span class="app-name">{{item.name}}</span>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class=other-rand>
+										<div class=flex-box>
+											<div class="item" v-for="(item,index) in appTop18.slice(10,14) ">
+												<div class="icon">
+													<img :src="item.icon" />
+												</div>
+												<div class="info">
+													<span class="rand">{{index+11}}</span>
+													<div class="app-name">{{item.name}}</div>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+										<div class=flex-box>
+											<div class="item" v-for="(item,index) in appTop18.slice(14,18) ">
+												<div class="icon">
+													<img :src="item.icon" />
+												</div>
+												<div class="info">
+													<span class="rand">{{index+15}}</span>
+													<div class="app-name">{{item.name}}</div>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<div class=bottom></div>
+							</div>
+							<div class=sub-box>
+								<div  class="header flex-box flex-box-s "> 
+									<span class="text text-gradient"> 游戏下载量TOP排行榜 </span>
+									<span class="sub-title">次</span>
+								</div>
+								<div class="pannel-body r2" ref="r2" v-show="showR1">
+									<div class="top-2 flex-box-bet">
+										<div v-for="(item, key) in gameTop18.slice(0,2)" :key="key">
+											<div class="item">
+												<span class="rand">
+													{{key +1}}
+												</span>
+												<div class="icon">
+													<img :src="item.icon" >
+												</div>
+												<div class="info">
+													<span class="app-name">{{item.name}}</span>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class=other-rand>
+										<div class=flex-box>
+											<div class="item" v-for="(item,index) in gameTop18.slice(2,6) ">
+												<div class="icon">
+													<img :src="item.icon" />
+												</div>
+												<div class="info">
+													<span class="rand">{{index+3}}</span>
+													<div class="app-name">{{item.name}}</div>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+										<div class=flex-box>
+											<div class="item" v-for="(item,index) in gameTop18.slice(6,10) ">
+												<div class="icon">
+													<img :src="item.icon" />
+												</div>
+												<div class="info">
+													<span class="rand">{{index+7}}</span>
+													<div class="app-name">{{item.name}}</div>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="pannel-body r2" v-show="!showR1" ref="r2">
+									<div class="top-2 flex-box-bet">
+										<div v-for="(item, key) in gameTop18.slice(0,2)" :key="key">
+											<div class="item">
+												<span class="rand">
+													{{key +1}}
+												</span>
+												<div class="icon">
+													<img :src="item.icon" >
+												</div>
+												<div class="info">
+													<span class="app-name">{{item.name}}</span>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class=other-rand>
+										<div class=flex-box>
+											<div class="item" v-for="(item,index) in gameTop18.slice(10,14) ">
+												<div class="icon">
+													<img :src="item.icon" />
+												</div>
+												<div class="info">
+													<span class="rand">{{index+11}}</span>
+													<div class="app-name">{{item.name}}</div>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+										<div class=flex-box>
+											<div class="item" v-for="(item,index) in gameTop18.slice(14,18) ">
+												<div class="icon">
+													<img :src="item.icon" />
+												</div>
+												<div class="info">
+													<span class="rand">{{index+15}}</span>
+													<div class="app-name">{{item.name}}</div>
+												    <div class="total">{{item.value}}次</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<div class=bottom></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+	<!--	<script type="text/javascript" src="js/odometer.min.js"></script>-->
+		<script type="text/javascript" src="js/echarts.js"></script>
+		<script type="text/javascript" src="js/chinaJson.js"></script>
+		<script type="text/javascript" src="js/china.js"></script>
+		<script type="text/javascript" src="js/index.js"></script>
+		<script src="js/axios.min.js"></script>
+		<script type="text/javascript" src="js/main.js?v=1.8"></script>
+	</body>
+
+</html>
